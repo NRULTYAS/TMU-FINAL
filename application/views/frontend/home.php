@@ -130,7 +130,7 @@
                 
                 <div class="d-flex">
                     <a href="<?= base_url('login') ?>" class="btn btn-primary me-2">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login Admin
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
                     </a>
                     <a href="<?= base_url('daftar') ?>" class="btn btn-outline-primary">
                         <i class="fas fa-user-plus me-2"></i>Daftar

@@ -41,11 +41,12 @@ class Login extends CI_Controller {
             if ($user->type == 1) {
                 $pendaftar_list = $this->db->get('scre_pendaftar')->result();
                 $data = array('pendaftar_list' => $pendaftar_list);
-                $this->load->view('frontend/pendaftar_list', $data);
+                $this->load->view('frontend/pendaftar_admin', $data);
                 return;
+            } else {
+                // Jika bukan admin, redirect ke halaman utama
+                redirect('halaman_utama');
             }
-            // Jika bukan admin, redirect ke halaman utama
-            redirect('halaman_utama');
         } else {
             $this->session->set_flashdata('error', 'Username atau password salah!');
             redirect('login');
@@ -56,7 +57,7 @@ class Login extends CI_Controller {
     public function logout()
     {
         $this->session->sess_destroy();
-        redirect('Dashboard'); 
+        redirect('home'); // frontend awal
     }
     
     // Registrasi user baru

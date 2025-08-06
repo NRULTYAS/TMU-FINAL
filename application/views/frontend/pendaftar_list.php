@@ -13,8 +13,8 @@
             <tr>
                 <th>ID</th>
                 <th>Nama Lengkap</th>
-                <th>NIP</th>
-                <th>Username</th>
+                <th>Email</th>
+                <th>No HP</th>
                 <th>Tanggal Daftar</th>
             </tr>
         </thead>
@@ -24,8 +24,8 @@
                     <tr>
                         <td><?= htmlspecialchars($pendaftar->id) ?></td>
                         <td><?= htmlspecialchars($pendaftar->nama_lengkap) ?></td>
-                        <td><?= htmlspecialchars($pendaftar->nip) ?></td>
-                        <td><?= htmlspecialchars($pendaftar->username) ?></td>
+                        <td><?= htmlspecialchars($pendaftar->email) ?></td>
+                        <td><?= htmlspecialchars($pendaftar->no_hp) ?></td>
                         <td><?= htmlspecialchars($pendaftar->created_at ?? '-') ?></td>
                     </tr>
                 <?php endforeach; ?>

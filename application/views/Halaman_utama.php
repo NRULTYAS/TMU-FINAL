@@ -76,11 +76,6 @@
 			<div class="col-12">
 				<!-- Welcome Section -->
 				<div class="card mb-4">
-					<div class="card-body bg-primary text-white">
-						<h4>Selamat Datang, <?= $this->session->userdata('nama') ?? 'Admin' ?>!</h4>
-						<p class="mb-0">Dashboard Admin Pendaftaran Diklat</p>
-					</div>
-				</div>
 
 				<!-- Menu -->
 				<div class="row mb-4">
@@ -130,45 +125,6 @@
 					</div>
 				</div>
 
-				<!-- Statistik -->
-				<div class="row">
-					<div class="col-md-3 mb-3">
-						<div class="card">
-							<div class="card-body text-center">
-								<i class="fa fa-book-open text-primary mb-2" style="font-size: 2rem;"></i>
-								<h5><?= $total_diklat ?? '0' ?></h5>
-								<small class="text-muted">Total Diklat</small>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3 mb-3">
-						<div class="card">
-							<div class="card-body text-center">
-								<i class="fa fa-layer-group text-success mb-2" style="font-size: 2rem;"></i>
-								<h5><?= $total_jenis_diklat ?? '0' ?></h5>
-								<small class="text-muted">Jenis Diklat</small>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3 mb-3">
-						<div class="card">
-							<div class="card-body text-center">
-								<i class="fa fa-users text-info mb-2" style="font-size: 2rem;"></i>
-								<h5><?= $total_pendaftar ?? '0' ?></h5>
-								<small class="text-muted">Total Pendaftar</small>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3 mb-3">
-						<div class="card">
-							<div class="card-body text-center">
-								<i class="fa fa-calendar text-secondary mb-2" style="font-size: 2rem;"></i>
-								<h5>2025</h5>
-								<small class="text-muted">Tahun Aktif</small>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>

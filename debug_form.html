@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Form Pendaftaran</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .registration-type-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .registration-type-card:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .registration-type-card.active {
+            border-color: #007bff;
+            background-color: #e7f3ff;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Informasi Diklat -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Informasi Diklat</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-primary" id="kategori-badge">PROGRAM DIKLAT</span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Diklat</label>
+                            <h6 id="info-nama-diklat">-</h6>
+                            <small>Kode: <span id="info-kode-diklat">-</span></small>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Total Kuota</label>
+                                <div id="info-kuota">-</div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Sisa Kuota</label>
+                                <div id="info-sisa-kuota">-</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Biaya Program</label>
+                            <div id="info-biaya">-</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <div id="info-status">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-3 text-center">Pilih Kategori Pendaftaran</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="registration-type-card text-center" data-type="existing">
+                                    <i class="fas fa-user-check text-success mb-3" style="font-size: 2rem;"></i>
+                                    <h6>Pernah Daftar</h6>
+                                    <p>Sudah pernah mendaftar diklat sebelumnya</p>
+                                    <small>Masukkan NIK</small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="registration-type-card text-center" data-type="new">
+                                    <i class="fas fa-user-plus text-primary mb-3" style="font-size: 2rem;"></i>
+                                    <h6>Belum Pernah Daftar</h6>
+                                    <p>Pendaftaran pertama kali</p>
+                                    <small>Isi data lengkap</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="debug-info" class="mt-4 alert alert-info">
+                            <h6>Debug Info:</h6>
+                            <div id="debug-text">Silakan klik salah satu kartu di atas</div>
+                        </div>
+                        
+                        <!-- Forms -->
+                        <div id="existing-user-form" style="display: none;" class="mt-4">
+                            <h5>Form Pernah Daftar</h5>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" id="existing-nik" placeholder="Masukkan NIK">
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-success w-100" id="btn-check-nik">
+                                        <i class="fas fa-search me-2"></i>Cari Data
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="nik-result" class="mt-3" style="display: none;"></div>
+                        </div>
+                        
+                        <div id="new-user-form" style="display: none;" class="mt-4">
+                            <h5>Form Belum Pernah Daftar</h5>
+                            <p>Form untuk pendaftar baru akan muncul di sini</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let registrationType = '';
+        
+        // Load diklat information
+        function loadDiklatInfo() {
+            console.log('Loading diklat info...');
+            
+            // Test dengan diklat_id yang sudah diketahui
+            const diklatId = '14-01807-46';
+            const apiUrl = `http://localhost/TMU1-main/Pendaftaran/get_diklat_info_detailed?diklat_id=${diklatId}`;
+            
+            console.log('API URL:', apiUrl);
+            
+            fetch(apiUrl)
+                .then(response => {
+                    console.log('Response received:', response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response:', data);
+                    
+                    if (data.status === 'success' && data.data) {
+                        const info = data.data;
+                        
+                        // Update informasi diklat
+                        document.getElementById('info-nama-diklat').textContent = info.nama_diklat || '-';
+                        document.getElementById('info-kuota').textContent = info.kuota || '-';
+                        document.getElementById('info-sisa-kuota').textContent = info.sisa_kuota || '-';
+                        document.getElementById('info-kode-diklat').textContent = info.kode_diklat || '-';
+                        document.getElementById('kategori-badge').textContent = info.jenis_diklat || 'PROGRAM DIKLAT';
+                        
+                        // Update biaya
+                        const biayaElement = document.getElementById('info-biaya');
+                        if (info.biaya && info.biaya > 0) {
+                            biayaElement.textContent = 'Rp ' + parseInt(info.biaya).toLocaleString('id-ID');
+                        } else {
+                            biayaElement.textContent = 'Gratis';
+                        }
+                        
+                        // Update status
+                        const statusElement = document.getElementById('info-status');
+                        let statusText = info.status || 'Unknown';
+                        let statusClass = 'secondary';
+                        
+                        if (info.status === 'open') {
+                            statusText = 'Terbuka';
+                            statusClass = 'success';
+                        } else if (info.status === 'closed') {
+                            statusText = 'Tutup';
+                            statusClass = 'danger';
+                        }
+                        
+                        statusElement.innerHTML = `<span class="badge bg-${statusClass}">${statusText}</span>`;
+                        
+                        console.log('Diklat info loaded successfully');
+                    } else {
+                        console.error('API returned error:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading diklat info:', error);
+                });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            
+            // Load diklat info
+            loadDiklatInfo();
+            
+            // Setup card event handlers
+            const cards = document.querySelectorAll('.registration-type-card');
+            console.log('Found registration cards:', cards.length);
+            
+            cards.forEach((card, index) => {
+                console.log(`Setting up card ${index}:`, card.dataset.type);
+                
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Card clicked:', this.dataset.type);
+                    
+                    // Remove active from all cards
+                    cards.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active to clicked card
+                    this.classList.add('active');
+                    
+                    // Set registration type
+                    registrationType = this.dataset.type;
+                    
+                    // Update debug info
+                    const debugText = document.getElementById('debug-text');
+                    debugText.textContent = `Selected: ${registrationType}`;
+                    
+                    // Show/hide forms
+                    const existingForm = document.getElementById('existing-user-form');
+                    const newForm = document.getElementById('new-user-form');
+                    
+                    if (registrationType === 'existing') {
+                        existingForm.style.display = 'block';
+                        newForm.style.display = 'none';
+                    } else if (registrationType === 'new') {
+                        existingForm.style.display = 'none';
+                        newForm.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Setup NIK check button
+            const checkNikBtn = document.getElementById('btn-check-nik');
+            if (checkNikBtn) {
+                checkNikBtn.addEventListener('click', function() {
+                    console.log('Check NIK button clicked');
+                    
+                    const nik = document.getElementById('existing-nik').value.trim();
+                    if (!nik) {
+                        alert('Masukkan NIK terlebih dahulu');
+                        return;
+                    }
+                    
+                    // Show loading
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mencari...';
+                    this.disabled = true;
+                    
+                    // Check NIK via API
+                    fetch('http://localhost/TMU1-main/Pendaftaran/check_existing_user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'nik=' + encodeURIComponent(nik)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Reset button
+                        this.innerHTML = '<i class="fas fa-search me-2"></i>Cari Data';
+                        this.disabled = false;
+                        
+                        const resultDiv = document.getElementById('nik-result');
+                        
+                        if (data.status === 'success' && data.data) {
+                            // NIK found
+                            const user = data.data;
+                            resultDiv.innerHTML = `
+                                <div class="alert alert-success">
+                                    <h6>Data Ditemukan</h6>
+                                    <p><strong>Nama:</strong> ${user.nama_lengkap}<br>
+                                    <strong>Email:</strong> ${user.email}</p>
+                                </div>
+                            `;
+                        } else {
+                            // NIK not found
+                            resultDiv.innerHTML = `
+                                <div class="alert alert-danger">
+                                    <h6>NIK Tidak Ditemukan</h6>
+                                    <p>NIK ${nik} belum terdaftar dalam sistem.</p>
+                                </div>
+                            `;
+                        }
+                        
+                        resultDiv.style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.innerHTML = '<i class="fas fa-search me-2"></i>Cari Data';
+                        this.disabled = false;
+                        
+                        document.getElementById('nik-result').innerHTML = `
+                            <div class="alert alert-warning">
+                                <h6>Terjadi Kesalahan</h6>
+                                <p>Tidak dapat memeriksa NIK saat ini.</p>
+                            </div>
+                        `;
+                        document.getElementById('nik-result').style.display = 'block';
+                    });
+                });
+            }
+            
+            console.log('Initialization complete');
+        });
+    </script>
+</body>
+</html>

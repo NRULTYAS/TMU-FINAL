@@ -20,46 +20,31 @@
             </div>
         <?php endif; ?>
 
-        <!-- FORM LOGIN -->
-        <form method="post" action="<?= site_url('login/proses') ?>" autocomplete="on">
+        <!-- FORM LOGIN ADMIN -->
+        <form method="post" action="<?= site_url('login/proses') ?>" class="mb-3">
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    class="form-control"
-                    placeholder="Masukkan Username"
-                    required
-                    autocomplete="username"
-                >
+                <label for="username" class="form-label">Username Admin</label>
+                <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    class="form-control"
-                    placeholder="Masukkan Password"
-                    required
-                    autocomplete="current-password"
-                >
+                <input type="password" class="form-control" id="password" name="password" required>
             </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Masuk</button>
-            </div>
+            <button type="submit" class="btn btn-success w-100">Login Admin</button>
         </form>
-        
+        <div class="d-grid mb-2">
+            <a href="<?= site_url('login/operator') ?>" class="btn btn-warning">Login Operator</a>
+        </div>
+        <div class="d-grid mb-2">
+            <a href="<?= site_url('login/peserta') ?>" class="btn btn-primary">Login Peserta</a>
+        </div>
         <hr class="my-4">
-        
         <div class="text-center">
             <p class="mb-2">Belum punya akun?</p>
             <a href="<?= base_url('daftar') ?>" class="btn btn-outline-primary">
                 <i class="fas fa-user-plus me-2"></i>Daftar Akun Baru
             </a>
         </div>
-        
         <div class="text-center mt-3">
             <a href="<?= base_url() ?>" class="btn btn-link text-muted">
                 <i class="fas fa-home me-1"></i>Kembali ke Beranda

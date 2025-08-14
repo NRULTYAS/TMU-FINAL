@@ -4,9 +4,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Pendaftaran extends CI_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->library('session');
-        $this->load->database();
         $this->load->helper('url');
+        $this->load->model('Diklat_model');
     }
 
     public function index($diklat_id = '13-63654-47') 
@@ -369,6 +368,88 @@ class Pendaftaran extends CI_Controller {
         $jadwal = $this->db->get_where('scre_diklat_jadwal', ['diklat_tahun_id' => $tahun_id, 'is_exist' => 1])->result();
         header('Content-Type: application/json');
         echo json_encode($jadwal);
+    }
+
+    public function check_existing_user() {
+        // Set response header
+        header('Content-Type: application/json');
+        
+        // Check if request method is POST
+        if ($this->input->server('REQUEST_METHOD') !== 'POST') {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid request method'
+            ]);
+            return;
+        }
+        
+        // Get NIK from POST data
+        $nik = $this->input->post('nik');
+        
+        if (empty($nik)) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'NIK is required'
+            ]);
+            return;
+        }
+        
+        // Validate NIK format (should be 15-16 digits to accommodate database varchar(15))
+        if (!preg_match('/^\d{15,16}$/', $nik)) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'NIK harus terdiri dari 15-16 digit angka'
+            ]);
+            return;
+        }
+        
+        // Truncate NIK to 15 characters if it's 16 digits (database limitation)
+        if (strlen($nik) === 16) {
+            $nik = substr($nik, 0, 15);
+        }
+        
+        try {
+            // Check if user exists in pendaftar table
+            $this->db->where('id', $nik);
+            $user = $this->db->get('scre_pendaftar')->row_array();
+            
+            if ($user) {
+                // User found - return user data
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'User found',
+                    'data' => [
+                        'id' => $user['id'],
+                        'nama_lengkap' => $user['nama_lengkap'] ?? '',
+                        'tempat_lahir' => $user['tempat_lahir'] ?? '',
+                        'tanggal_lahir' => $user['tanggal_lahir'] ?? '',
+                        'jenis_kelamin' => $user['jenis_kelamin'] ?? '',
+                        'agama' => $user['agama'] ?? '',
+                        'alamat' => $user['alamat'] ?? '',
+                        'no_hp' => $user['no_hp'] ?? '',
+                        'email' => $user['email'] ?? '',
+                        'pendidikan_terakhir' => $user['pendidikan_terakhir'] ?? '',
+                        'pekerjaan' => $user['pekerjaan'] ?? '',
+                        'nama_ayah' => $user['nama_ayah'] ?? '',
+                        'nama_ibu' => $user['nama_ibu'] ?? ''
+                    ]
+                ]);
+            } else {
+                // User not found
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'NIK tidak ditemukan dalam database',
+                    'data' => null
+                ]);
+            }
+            
+        } catch (Exception $e) {
+            // Database error
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memeriksa data: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function simpan() {

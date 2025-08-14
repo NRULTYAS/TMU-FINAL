@@ -3,6 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Diklat_model extends CI_Model
 {
+    // Hapus data duplikat berdasarkan nama_diklat
+    public function delete_duplicates() {
+        $sql = "DELETE t1 FROM scre_diklat t1 INNER JOIN scre_diklat t2 WHERE t1.id > t2.id AND t1.nama_diklat = t2.nama_diklat";
+        return $this->db->query($sql);
+    }
     private $table = 'scre_diklat';
 
     // Ambil semua kategori dari tabel scre_jenis_diklat

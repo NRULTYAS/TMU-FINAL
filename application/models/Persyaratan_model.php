@@ -3,6 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Persyaratan_model extends CI_Model
 {
+    // Hapus data duplikat berdasarkan persyaratan
+    public function delete_duplicates() {
+        $sql = "DELETE t1 FROM scre_persyaratan t1 INNER JOIN scre_persyaratan t2 WHERE t1.id > t2.id AND t1.persyaratan = t2.persyaratan";
+        return $this->db->query($sql);
+    }
     private $table = 'scre_persyaratan';
 
     public function get_all()

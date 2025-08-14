@@ -3,6 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class DiklatTahun_model extends CI_Model
 {
+    // Hapus data duplikat berdasarkan diklat_id dan tahun
+    public function delete_duplicates() {
+        $sql = "DELETE t1 FROM scre_diklat_tahun t1 INNER JOIN scre_diklat_tahun t2 WHERE t1.id > t2.id AND t1.diklat_id = t2.diklat_id AND t1.tahun = t2.tahun";
+        return $this->db->query($sql);
+    }
     // Ambil semua tahun diklat
     public function get_all()
     {

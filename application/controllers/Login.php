@@ -2,19 +2,83 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Login extends CI_Controller {
-
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Login_model');
-        $this->load->helper('url');
+        $this->load->library('form_validation');
         $this->load->library('session');
         $this->load->database();
-        $this->load->library('form_validation');
+        $this->load->model('Login_model');
+        $this->load->model('Persyaratan_model');
+        $this->load->model('Pendaftaran_model');
+        $this->load->model('Pendaftar_model');
+    }
+    // Tampilan login operator loket
+    public function operator()
+    {
+        $this->load->view('login/operator');
+    }
+
+    // Proses login operator loket
+    public function proses_operator()
+    {
+        // Pastikan library dan model sudah di-load di konstruktor
+        $username = $this->input->post('username', true);
+        $password = $this->input->post('password', true);
+        $user = $this->Login_model->cek_login($username, $password);
+        if ($user && $user->type == 2) { // type 2 untuk operator
+            $session_data = array(
+                'id'        => $user->id,
+                'username'  => $user->username,
+                'nama'      => $user->nama_lengkap,
+                'type'      => 'operator',
+                'logged_in' => true
+            );
+            $this->session->set_userdata($session_data);
+            redirect('operator/dashboard');
+        } else {
+            $this->session->set_flashdata('error', 'Username atau password salah!');
+            redirect('login/operator');
+        }
+    }
+
+    // Tampilan login peserta
+    public function peserta()
+    {
+        $this->load->view('login/peserta');
+    }
+
+    // Proses login peserta
+    public function proses_peserta()
+    {
+        $CI =& get_instance();
+        $username = $CI->input->post('username', true);
+        $password = $CI->input->post('password', true);
+        $user = $CI->db
+            ->where('username', $username)
+            ->where('password', md5($password))
+            ->get('scre_peserta_login')
+            ->row();
+        if ($user) {
+            $session_data = array(
+                'id'        => $user->id,
+                'username'  => $user->username,
+                'nama'      => $user->nama_lengkap,
+                'type'      => 'peserta',
+                'logged_in' => true
+            );
+            $CI->session->set_userdata($session_data);
+            redirect('halaman_utama');
+            return;
+        } else {
+            $CI->session->set_flashdata('error', 'Username atau password salah!');
+            redirect('login/peserta');
+        }
     }
 
     public function index()
     {
+        $this->load->library('session');
         if ($this->session->userdata('logged_in')) {
             redirect('halaman_utama');
         }
@@ -25,28 +89,23 @@ class Login extends CI_Controller {
     {
         $username = $this->input->post('username', true);
         $password = $this->input->post('password', true);
-        $user = $this->Login_model->cek_login($username, $password);
-
+        // Login admin saja (form login utama)
+        $user = $this->db
+            ->where('username', $username)
+            ->where('password', md5($password))
+            ->where('type', 1)
+            ->get('scre_user')
+            ->row();
         if ($user) {
             $session_data = array(
                 'id'        => $user->id,
                 'username'  => $user->username,
                 'nama'      => $user->nama_lengkap,
-                'type'      => $user->type,
+                'type'      => 'admin',
                 'logged_in' => true
             );
             $this->session->set_userdata($session_data);
-
-            // Jika admin (type == 1), tampilkan list pendaftar
-            if ($user->type == 1) {
-                $pendaftar_list = $this->db->get('scre_pendaftar')->result();
-                $data = array('pendaftar_list' => $pendaftar_list);
-                $this->load->view('frontend/pendaftar_admin', $data);
-                return;
-            } else {
-                // Jika bukan admin, redirect ke halaman utama
-                redirect('halaman_utama');
-            }
+            redirect('admin/dashboard');
         } else {
             $this->session->set_flashdata('error', 'Username atau password salah!');
             redirect('login');
@@ -56,13 +115,15 @@ class Login extends CI_Controller {
     // Logout 
     public function logout()
     {
-        $this->session->sess_destroy();
-        redirect('home'); // frontend awal
+    $this->load->library('session');
+    $this->session->sess_destroy();
+    redirect('home'); // frontend awal
     }
     
     // Registrasi user baru
     public function register()
     {
+        $this->load->library('session');
         if ($this->session->userdata('logged_in')) {
             redirect('halaman_utama');
         }
@@ -73,6 +134,10 @@ class Login extends CI_Controller {
     public function proses_register()
     {
         // Validasi form
+        $this->load->library('form_validation');
+        $this->load->library('session');
+        $this->load->model('Login_model');
+        $this->load->helper('url');
         $this->form_validation->set_rules('nama_lengkap', 'Nama Lengkap', 'required|trim');
         $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[scre_user.username]');
         $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
@@ -105,8 +170,9 @@ class Login extends CI_Controller {
     private function generate_user_id()
     {
         // Get last user ID
-        $this->db->select_max('id');
-        $query = $this->db->get('scre_user');
+    $this->load->database();
+    $this->db->select_max('id');
+    $query = $this->db->get('scre_user');
         $last_id = $query->row()->id;
         if (!$last_id) {
             return 'USR001';

@@ -133,7 +133,11 @@ $autoload['language'] = array();
 |	$autoload['model'] = array('first_model' => 'first');
 */
 $autoload['model'] = array(
-    'Diklat_model' => 'diklat_model',
-    'DiklatTahun_model' => 'diklattahun_model',
-    'Schedule_model' => 'Schedule_model'
+    'Login_model',
+    'Diklat_model',
+    'DiklatTahun_model',
+    'Persyaratan_model',
+    'Pendaftaran_model',
+    'Pendaftar_model',
+    'Schedule_model'
 );

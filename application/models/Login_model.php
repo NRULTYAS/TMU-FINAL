@@ -2,6 +2,11 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Login_model extends CI_Model {
+    // Hapus data duplikat berdasarkan username
+    public function delete_duplicates() {
+        $sql = "DELETE t1 FROM scre_user t1 INNER JOIN scre_user t2 WHERE t1.id > t2.id AND t1.username = t2.username";
+        return $this->db->query($sql);
+    }
 
     public function cek_login($username, $password)
     {
